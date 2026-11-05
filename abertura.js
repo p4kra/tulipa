@@ -231,14 +231,14 @@
       verticalAlign: '-0.15em', background: COR_CODIGO, marginLeft: '0.05em' });
     sub.append(subTexto, cursor);
 
-    // Foto do casal no encerramento: bordas suaves que se dissolvem no preto, acima do título
+    // Foto do casal no encerramento (horizontal 16:9): bordas suaves que se dissolvem no preto, acima do título
     let fotoMoldura = null;
     if (fica && opcoes.foto !== false) {
       fotoMoldura = document.createElement('div');
-      const mascaraFoto = 'radial-gradient(closest-side, #000 72%, rgba(0,0,0,0.5) 88%, transparent 100%)';
+      const mascaraFoto = 'radial-gradient(ellipse 88% 86% at 50% 48%, #000 66%, rgba(0,0,0,0.55) 86%, transparent 100%)';
       Object.assign(fotoMoldura.style, largo
-        ? { width: 'min(22vw, 33vh)', height: 'min(32vw, 48vh)', marginBottom: '1.2vh' }
-        : { width: 'min(52vw, 26vh)', height: 'min(70vw, 35vh)', marginBottom: '1vh' },
+        ? { width: 'min(36vw, 56vh)', height: 'min(20.25vw, 31.5vh)', marginBottom: '1.8vh' }
+        : { width: 'min(86vw, 46vh)', height: 'min(48.4vw, 25.9vh)', marginBottom: '1.4vh' },
         { position: 'relative', flex: '0 0 auto', overflow: 'hidden',
           opacity: '0', maskImage: mascaraFoto, webkitMaskImage: mascaraFoto });
       const fotoImg = document.createElement('img');
