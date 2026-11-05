@@ -495,13 +495,11 @@ body {
 .py-90 { top: 90%; } .py-91 { top: 91%; } .py-92 { top: 92%; } .py-93 { top: 93%; } .py-94 { top: 94%; }
 .py-95 { top: 95%; }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+.declaracao--reduzido *,
+.declaracao--reduzido *::before,
+.declaracao--reduzido *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

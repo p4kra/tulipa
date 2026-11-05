@@ -17,9 +17,7 @@
     }
   });
 
-  const midiaReduzido = window.matchMedia
-    ? window.matchMedia('(prefers-reduced-motion: reduce)')
-    : { matches: false };
+  const reduzido = /(?:^|[?&])reduzido=1(?:&|$)/.test(window.location.search || '');
 
   let instancia = null;
   let painel = null;
@@ -52,7 +50,6 @@
     }
     if (!window.Tulipa || typeof window.Tulipa.criar !== 'function') return;
 
-    const reduzido = Boolean(midiaReduzido.matches);
     instancia = window.Tulipa.criar(canvas, {
       fonte: '"JetBrains Mono", monospace',
       reduzido,
@@ -102,16 +99,8 @@
     }
   });
 
-  if (typeof midiaReduzido.addEventListener === 'function') {
-    midiaReduzido.addEventListener('change', () => {
-      if (!instancia) return;
-      montar();
-    });
-  }
-
   async function iniciarSite() {
     await carregarFonte();
-    const reduzido = Boolean(midiaReduzido.matches);
     if (window.Abertura && typeof window.Abertura.tocar === 'function') {
       try {
         await window.Abertura.tocar({
