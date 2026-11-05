@@ -196,14 +196,15 @@
     Object.assign(bloco.style, { display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '0 1 auto' });
 
     // Largura útil do texto: tela toda, ou o meio entre as flores no desktop.
-    const util = comFlores && largo ? '44vw' : '(100vw - 32px)';
+    const util = comFlores && largo ? '38vw' : '(100vw - 40px)';
     // Tamanho pelo número de caracteres: a linha mono (0,6 em por caractere) ocupa a largura útil.
     const emPor = n => n * 0.6 + 0.4;
     const LINHAS = (comFlores && TEXTOS[modo].linhas) || [TITULO];
     const maior = Math.max(...LINHAS.map(l => l.length));
+    const maxTituloPx = fica ? (largo ? '76px' : '46px') : '128px';
     const titulo = document.createElement('div');
     Object.assign(titulo.style, {
-      fontSize: `min(calc(${util} / ${emPor(maior).toFixed(2)}), 128px)`, lineHeight: '1.1',
+      fontSize: `min(calc(${util} / ${emPor(maior).toFixed(2)}), ${maxTituloPx})`, lineHeight: '1.1',
       fontWeight: '400', whiteSpace: 'pre', color: COR_TEXTO, letterSpacing: '-0.01em'
     });
     const cel = [];
@@ -218,16 +219,40 @@
       titulo.appendChild(lt);
     });
 
+    const maxSubPx = fica ? (largo ? '26px' : '18px') : '36px';
     const sub = document.createElement('div');
     Object.assign(sub.style, {
-      fontSize: `min(calc(${util} / ${Math.max(19, emPor(SUB.length) * 1.15).toFixed(2)}), 36px)`,
-      lineHeight: '1.2', marginTop: '0.9em', color: COR_SUB, whiteSpace: 'pre', fontVariantNumeric: 'tabular-nums'
+      fontSize: `min(calc(${util} / ${Math.max(19, emPor(SUB.length) * 1.15).toFixed(2)}), ${maxSubPx})`,
+      lineHeight: '1.2', marginTop: fica ? '0.65em' : '0.9em', color: COR_SUB, whiteSpace: 'pre', fontVariantNumeric: 'tabular-nums'
     });
     const subTexto = document.createElement('span');
     const cursor = document.createElement('span');
     Object.assign(cursor.style, { display: 'inline-block', width: '0.6em', height: '1.05em',
       verticalAlign: '-0.15em', background: COR_CODIGO, marginLeft: '0.05em' });
     sub.append(subTexto, cursor);
+
+    // Foto do casal no encerramento: bordas suaves que se dissolvem no preto, acima do título
+    let fotoMoldura = null;
+    if (fica && opcoes.foto !== false) {
+      fotoMoldura = document.createElement('div');
+      const mascaraFoto = 'radial-gradient(closest-side, #000 72%, rgba(0,0,0,0.5) 88%, transparent 100%)';
+      Object.assign(fotoMoldura.style, largo
+        ? { width: 'min(22vw, 33vh)', height: 'min(32vw, 48vh)', marginBottom: '1.2vh' }
+        : { width: 'min(52vw, 26vh)', height: 'min(70vw, 35vh)', marginBottom: '1vh' },
+        { position: 'relative', flex: '0 0 auto', overflow: 'hidden',
+          opacity: '0', maskImage: mascaraFoto, webkitMaskImage: mascaraFoto });
+      const fotoImg = document.createElement('img');
+      fotoImg.src = new URL(typeof opcoes.foto === 'string' ? opcoes.foto : 'foto-final.jpg', BASE).href;
+      fotoImg.alt = '';
+      fotoImg.draggable = false;
+      Object.assign(fotoImg.style, {
+        width: '100%', height: '100%', objectFit: 'contain', objectPosition: '50% 50%',
+        display: 'block', userSelect: 'none', pointerEvents: 'none'
+      });
+      fotoMoldura.appendChild(fotoImg);
+      bloco.append(fotoMoldura);
+    }
+
     bloco.append(titulo, sub);
 
     // Flores do encerramento: canvases próprios; as instâncias nascem quando a camada já está no DOM.
@@ -241,8 +266,8 @@
         // brilho, faíscas e pólen se dissolvem no preto em vez de cortar num quadrado
         const mascara = 'radial-gradient(closest-side, #000 70%, transparent 100%)';
         Object.assign(c.style, largo
-          ? { width: 'min(26vw, 70vh)', height: 'min(26vw, 70vh)', flex: '0 0 auto', display: 'block' }
-          : { width: '46vw', height: '46vw', flex: '0 0 auto', display: 'block' },
+          ? { width: 'min(25vw, 64vh)', height: 'min(25vw, 64vh)', flex: '0 0 auto', display: 'block' }
+          : { width: '36vw', height: '36vw', flex: '0 0 auto', display: 'block' },
           { maskImage: mascara, webkitMaskImage: mascara });
         c.dataset.especie = rotulo;
         telas.push(c);
@@ -252,7 +277,7 @@
       if (largo) camada.append(lirio, bloco, tulipa);
       else {
         const linha = document.createElement('div');
-        Object.assign(linha.style, { display: 'flex', gap: '2vw', justifyContent: 'center', marginBottom: '2vh' });
+        Object.assign(linha.style, { display: 'flex', gap: '3vw', justifyContent: 'center', marginBottom: '0.8vh' });
         linha.append(lirio, tulipa);
         camada.append(linha, bloco);
       }
@@ -294,6 +319,18 @@
         }
       });
 
+      if (fotoMoldura) {
+        if (reduzido) {
+          fotoMoldura.style.opacity = '1';
+          fotoMoldura.style.transform = 'scale(1)';
+        } else {
+          const pFoto = clamp((t - (D + 0.85)) / 1.8);
+          const sFoto = pFoto * pFoto * (3 - 2 * pFoto);
+          fotoMoldura.style.opacity = String(sFoto);
+          fotoMoldura.style.transform = `scale(${(0.95 + 0.05 * sFoto).toFixed(4)})`;
+        }
+      }
+
       if (reduzido) {
         subTexto.textContent = SUB; cursor.style.opacity = '0';
         return;
@@ -307,8 +344,8 @@
     }
 
     const fim = fica ? subFim + 2.3 : DURACAO; // encerramento: depois que o cursor sumiu
-    // Comandos: nunca sobre o texto nem sobre as flores
-    const obstaculos = () => [titulo, sub, ...telas].map(e => {
+    // Comandos: nunca sobre o texto, a foto nem as flores
+    const obstaculos = () => [titulo, sub, ...(fotoMoldura ? [fotoMoldura] : []), ...telas].map(e => {
       const r = e.getBoundingClientRect();
       return { x: r.left, y: r.top, w: r.width, h: r.height };
     });
