@@ -201,10 +201,10 @@
     const emPor = n => n * 0.6 + 0.4;
     const LINHAS = (comFlores && TEXTOS[modo].linhas) || [TITULO];
     const maior = Math.max(...LINHAS.map(l => l.length));
-    const maxTituloPx = fica ? (largo ? '76px' : '46px') : '128px';
+    const maxTituloPx = fica ? (largo ? '66px' : '40px') : '128px';
     const titulo = document.createElement('div');
     Object.assign(titulo.style, {
-      fontSize: `min(calc(${util} / ${emPor(maior).toFixed(2)}), ${maxTituloPx})`, lineHeight: '1.1',
+      fontSize: `min(calc(${util} / ${emPor(maior).toFixed(2)}), ${maxTituloPx})`, lineHeight: '1.08',
       fontWeight: '400', whiteSpace: 'pre', color: COR_TEXTO, letterSpacing: '-0.01em'
     });
     const cel = [];
@@ -219,11 +219,11 @@
       titulo.appendChild(lt);
     });
 
-    const maxSubPx = fica ? (largo ? '26px' : '18px') : '36px';
+    const maxSubPx = fica ? (largo ? '23px' : '16px') : '36px';
     const sub = document.createElement('div');
     Object.assign(sub.style, {
       fontSize: `min(calc(${util} / ${Math.max(19, emPor(SUB.length) * 1.15).toFixed(2)}), ${maxSubPx})`,
-      lineHeight: '1.2', marginTop: fica ? '0.65em' : '0.9em', color: COR_SUB, whiteSpace: 'pre', fontVariantNumeric: 'tabular-nums'
+      lineHeight: '1.2', marginTop: fica ? '0.55em' : '0.9em', color: COR_SUB, whiteSpace: 'pre', fontVariantNumeric: 'tabular-nums'
     });
     const subTexto = document.createElement('span');
     const cursor = document.createElement('span');
@@ -231,29 +231,38 @@
       verticalAlign: '-0.15em', background: COR_CODIGO, marginLeft: '0.05em' });
     sub.append(subTexto, cursor);
 
-    // Foto do casal no encerramento (horizontal 16:9): bordas suaves que se dissolvem no preto, acima do título
-    let fotoMoldura = null;
+    // Fotos do casal no encerramento (horizontais 16:9): uma acima do título e outra abaixo da frase
+    let fotoMoldura = null, fotoMoldura2 = null;
     if (fica && opcoes.foto !== false) {
-      fotoMoldura = document.createElement('div');
       const mascaraFoto = 'radial-gradient(ellipse 88% 86% at 50% 48%, #000 66%, rgba(0,0,0,0.55) 86%, transparent 100%)';
-      Object.assign(fotoMoldura.style, largo
-        ? { width: 'min(36vw, 56vh)', height: 'min(20.25vw, 31.5vh)', marginBottom: '1.8vh' }
-        : { width: 'min(86vw, 46vh)', height: 'min(48.4vw, 25.9vh)', marginBottom: '1.4vh' },
-        { position: 'relative', flex: '0 0 auto', overflow: 'hidden',
-          opacity: '0', maskImage: mascaraFoto, webkitMaskImage: mascaraFoto });
-      const fotoImg = document.createElement('img');
-      fotoImg.src = new URL(typeof opcoes.foto === 'string' ? opcoes.foto : 'foto-final.jpg', BASE).href;
-      fotoImg.alt = '';
-      fotoImg.draggable = false;
-      Object.assign(fotoImg.style, {
-        width: '100%', height: '100%', objectFit: 'contain', objectPosition: '50% 50%',
-        display: 'block', userSelect: 'none', pointerEvents: 'none'
-      });
-      fotoMoldura.appendChild(fotoImg);
+      const criarMolduraFoto = (arquivo, margemEstilo) => {
+        const m = document.createElement('div');
+        Object.assign(m.style, largo
+          ? { width: 'min(31vw, 47vh)', height: 'min(17.4vw, 26.4vh)' }
+          : { width: 'min(74vw, 39vh)', height: 'min(41.6vw, 22vh)' },
+          margemEstilo,
+          { position: 'relative', flex: '0 0 auto', overflow: 'hidden',
+            opacity: '0', maskImage: mascaraFoto, webkitMaskImage: mascaraFoto });
+        const img = document.createElement('img');
+        img.src = new URL(arquivo, BASE).href;
+        img.alt = '';
+        img.draggable = false;
+        Object.assign(img.style, {
+          width: '100%', height: '100%', objectFit: 'contain', objectPosition: '50% 50%',
+          display: 'block', userSelect: 'none', pointerEvents: 'none'
+        });
+        m.appendChild(img);
+        return m;
+      };
+      fotoMoldura = criarMolduraFoto(typeof opcoes.foto === 'string' ? opcoes.foto : 'foto-final.jpg',
+        { marginBottom: largo ? '1.3vh' : '1vh' });
+      fotoMoldura2 = criarMolduraFoto(typeof opcoes.foto2 === 'string' ? opcoes.foto2 : 'foto-final-2.jpg',
+        { marginTop: largo ? '1.5vh' : '1.2vh' });
       bloco.append(fotoMoldura);
     }
 
     bloco.append(titulo, sub);
+    if (fotoMoldura2) bloco.append(fotoMoldura2);
 
     // Flores do encerramento: canvases próprios; as instâncias nascem quando a camada já está no DOM.
     const flores = [];
@@ -267,7 +276,7 @@
         const mascara = 'radial-gradient(closest-side, #000 70%, transparent 100%)';
         Object.assign(c.style, largo
           ? { width: 'min(25vw, 64vh)', height: 'min(25vw, 64vh)', flex: '0 0 auto', display: 'block' }
-          : { width: '36vw', height: '36vw', flex: '0 0 auto', display: 'block' },
+          : { width: '31vw', height: '31vw', flex: '0 0 auto', display: 'block' },
           { maskImage: mascara, webkitMaskImage: mascara });
         c.dataset.especie = rotulo;
         telas.push(c);
@@ -277,7 +286,7 @@
       if (largo) camada.append(lirio, bloco, tulipa);
       else {
         const linha = document.createElement('div');
-        Object.assign(linha.style, { display: 'flex', gap: '3vw', justifyContent: 'center', marginBottom: '0.8vh' });
+        Object.assign(linha.style, { display: 'flex', gap: '3vw', justifyContent: 'center', marginBottom: '0.6vh' });
         linha.append(lirio, tulipa);
         camada.append(linha, bloco);
       }
@@ -330,6 +339,17 @@
           fotoMoldura.style.transform = `scale(${(0.95 + 0.05 * sFoto).toFixed(4)})`;
         }
       }
+      if (fotoMoldura2) {
+        if (reduzido) {
+          fotoMoldura2.style.opacity = '1';
+          fotoMoldura2.style.transform = 'scale(1)';
+        } else {
+          const pFoto2 = clamp((t - (D + 1.35)) / 1.8);
+          const sFoto2 = pFoto2 * pFoto2 * (3 - 2 * pFoto2);
+          fotoMoldura2.style.opacity = String(sFoto2);
+          fotoMoldura2.style.transform = `scale(${(0.95 + 0.05 * sFoto2).toFixed(4)})`;
+        }
+      }
 
       if (reduzido) {
         subTexto.textContent = SUB; cursor.style.opacity = '0';
@@ -344,8 +364,8 @@
     }
 
     const fim = fica ? subFim + 2.3 : DURACAO; // encerramento: depois que o cursor sumiu
-    // Comandos: nunca sobre o texto, a foto nem as flores
-    const obstaculos = () => [titulo, sub, ...(fotoMoldura ? [fotoMoldura] : []), ...telas].map(e => {
+    // Comandos: nunca sobre o texto, as fotos nem as flores
+    const obstaculos = () => [titulo, sub, ...(fotoMoldura ? [fotoMoldura] : []), ...(fotoMoldura2 ? [fotoMoldura2] : []), ...telas].map(e => {
       const r = e.getBoundingClientRect();
       return { x: r.left, y: r.top, w: r.width, h: r.height };
     });
